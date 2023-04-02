@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 import argparse
 import shelve
 import socket
@@ -13,7 +13,7 @@ clients = shelve.open('data')
 
 class Client:
 
-    def __init__(self, name, service, date=None):
+    def __init__(self, name, service, date=datetime.now()):
 
         self.name = name
         self.service  = service
@@ -34,18 +34,24 @@ def list_clients():
 
 def print_info(client):
 
-    print(f'''Name of client:      ---> {client.name}
+    try:
+        print(f'''Name of client:      ---> {client.name}
 Service of Streaming ---> {client.service}
-Date of payment      ---> {client.date}
-
+Date of payment      ---> {client.date.strftime("%d/%m/%y")}
     ''')
+
+    except Exception as e:
+        print('[!!] An error occurred')
 
 def add(args):
     if not args.name or not args.service:
         print("Missing arguments")
     else:
-        clients[args.name] = Client(args.name, args.service, args.date)
+
+        clients[args.name] = Client(args.name, args.service)
+        if args.date: insert_date(args, args.name)
         print(f"[*] Client {clients[args.name].name} added on the system") 
+
 
 def delete(client):
     #TODO: deletes a client
@@ -53,21 +59,39 @@ def delete(client):
 
 def change(args):
 
-    obj = args.change
+    name = args.change
     if args.date:
 
-        obj = clients[obj]
-        obj.date = args.date
-        print(f"[*] Date of {obj.name} changed to {obj.date}")
+        insert_date(args, name)
+        print(f"[*] Date of {name} changed to {args.date}")
 
-    clients[args.change] = obj
-    clients.close()
+def insert_date(args, arg_name):
+
+        date = str(args.date)
+        name = str(arg_name)
+        date = datetime.strptime(date, "%d/%m/%y")
+
+        obj = clients[name]
+        obj.date = date
+
+        clients[name] = obj
+        clients.close()
 
 def show_payments():
 
     #TODO: shows the payment contability
 
     return 0
+
+def del_client(args):
+    
+    try:
+        del(clients[args.backspace])
+
+        print(f"[*] Client {args.backspace} removed of system")
+    except KeyError as e:
+        print(f'''[!!] No client {args.backspace} on system
+Error: {e}''')
 
 if __name__ == '__main__':
 
@@ -101,3 +125,7 @@ if __name__ == '__main__':
 
     if args.payments:
         show_payments()
+
+    if args.backspace:
+        del_client(args)
+
