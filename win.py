@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import argparse
+import os
 import shelve
 import socket
 import shlex
@@ -10,6 +11,10 @@ import sys
 import textwrap
 
 #global variables
+path = os.path.join('/data', 'data', 'com.termux', 'files', 'home', 'win')
+print(os.getcwd())
+os.chdir(path)
+print(os.getcwd())
 clients = shelve.open('data')
 
 class Client:
