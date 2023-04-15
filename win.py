@@ -16,9 +16,15 @@ class Client:
     #__slots__ = ['_name', '_service', '_date']
 
     def __init__(self, name, service, date=datetime.now()):
-        self.name = name
-        self.service  = service
-        self.date = date
+        self._name = name
+        self._service  = service
+        self._date = date
+
+    def __str__(self):
+        try:
+            return '\nName of client:      ---> '+ str(self.name) + '\nService of Streaming ---> ' + str(self.service) + '\nDate of payment      ---> ' + str(self.date.strftime("%d/%m/%y"))
+        except Exception as e:
+            return str(e)
 
     def update():
         #TODO: updates the date
@@ -34,13 +40,7 @@ def list_clients():
         print_info(v)
 
 def print_info(client):
-    try:
-        print(f'''Name of client:      ---> {client.name}
-Service of Streaming ---> {client.service}
-Date of payment      ---> {client.date.strftime("%d/%m/%y")}
-    ''')
-    except Exception as e:
-        print('[!!] An error occurred')
+    print(client)
 
 def add(args):
     if not args.name or not args.service:
@@ -53,8 +53,11 @@ def add(args):
 def change(args):
     name = args.change
     if args.date:
-        insert_date(args, name)
-        print(f"[*] Date of {name} changed to {args.date}")
+        try:
+            insert_date(args, name)
+            print(f"[*] Date of {name} changed to {args.date}")
+        except ValueError as e:
+            print('[!] Invalid value')
 
 def insert_date(args, arg_name):
         date = str(args.date)
