@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 
 from datetime import datetime
+import abc
 import argparse
 import os
 import shelve
@@ -17,23 +18,43 @@ os.chdir(path)
 print(os.getcwd())
 clients = shelve.open('data')
 
-class Client:
-    #__slots__ = ['_name', '_service', '_date']
+def init():
+    CalculaValor.register(CalculaTrinta)
 
+class CalculaValor(abc.ABC):
+    @abc.abstractmethod
+    def calcular(self):
+        pass
+
+class CalculaTrinta:
+    def __init__(self):
+        self._venceu = False
+
+    def calcular(self, date):
+        print(date)
+        return self._venceu
+
+class Client:
     def __init__(self, name, service, date=datetime.now()):
         self._name = name
         self._service  = service
         self._date = date
+        self._CalculaValor = CalculaTrinta()
+
+    def noPrazo(self):
+        return self._CalculaValor.calcular(self._date)
+
+    def setCalculo(self, CalculoValor):
+        self._CalculoValor = CalculoValor
 
     def __str__(self):
         try:
-            return '\nName of client:      ---> '+ str(self.name) + '\nService of Streaming ---> ' + str(self.service) + '\nDate of payment      ---> ' + str(self.date.strftime("%d/%m/%y"))
+            return '\nName of client:      ---> '+ str(self._name) + '\nService of Streaming ---> ' + str(self._service) + '\nDate of payment      ---> ' + str(self._date.strftime("%d/%m/%y")) + '\nStatus: ' + str(self.noPrazo())
         except Exception as e:
             return str(e)
 
-    def update():
-        #TODO: updates the date
-        pass
+    def update(self):
+        self._date = datetime.today()
 
 def list_clients():
     if not clients.items():
@@ -53,7 +74,7 @@ def add(args):
     else:
         clients[args.name] = Client(args.name, args.service)
         if args.date: insert_date(args, args.name)
-        print(f"[*] Client {clients[args.name].name} added on the system") 
+        print(f"[*] Client {clients[args.name]._name} added on the system") 
 
 def change(args):
     name = args.change
@@ -73,10 +94,6 @@ def insert_date(args, arg_name):
         clients[name] = obj
         clients.close()
 
-def show_payments():
-    #TODO: shows the payment contability
-    pass
-
 def del_client(args):
     try:
         del(clients[args.backspace])
@@ -85,7 +102,10 @@ def del_client(args):
         print(f'''[!!] No client {args.backspace} on system
 Error: {e}''')
 
+init()
+
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='WIN Streaming Screen Manager',formatter_class=argparse.RawDescriptionHelpFormatter, epilog=textwrap.dedent('''Example:
     win.py -a -n Maria -s Netflix -d 190804 # add client
     win.py -u Maria # update date of payment
@@ -100,10 +120,10 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--list', action='store_true', help='list all the clients recorded')
     parser.add_argument('-c', '--change', help='changes the value of a object')
     parser.add_argument('-d', '--date', help='sets the date of the payment')
-    parser.add_argument('-p', '--payments', action='store_true', help='shows the payment contability') 
+
     args = parser.parse_args()
     if args.add: add(args)
     if args.change: change(args)
     if args.list: list_clients()
-    if args.payments: show_payments()
     if args.backspace: del_client(args)
+    if args.update: args.update.update()
