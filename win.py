@@ -17,6 +17,11 @@ print(os.getcwd())
 os.chdir(path)
 print(os.getcwd())
 clients = shelve.open('data')
+colors = {
+    "RED": '\033[31m',
+    "GREEN": '\033[32m',
+    "BLANK": '\033[m'
+}
 
 class CalculaValor(abc.ABC):
     @abc.abstractmethod
@@ -54,9 +59,9 @@ class Client:
 
     def noPrazo(self):
         if self._CalculaValor.calcular(self._date):
-            return "Prazo Vencido"
+            return '{}Prazo Vencido{}'.format(colors["RED"],colors["BLANK"])
         else:
-            return "No prazo"
+            return '{}No prazo{}'.format(colors["GREEN"], colors["BLANK"])
 
     def setCalculo(self, CalculoValor):
         self._CalculoValor = CalculoValor
