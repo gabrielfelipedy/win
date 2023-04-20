@@ -18,31 +18,45 @@ os.chdir(path)
 print(os.getcwd())
 clients = shelve.open('data')
 
-def init():
-    CalculaValor.register(CalculaTrinta)
-
 class CalculaValor(abc.ABC):
     @abc.abstractmethod
     def calcular(self):
         pass
 
-class CalculaTrinta:
-    def __init__(self):
-        self._venceu = False
-
+class CalculaTrintaEUm:
     def calcular(self, date):
-        print(date)
-        return self._venceu
+        periodo = datetime.now() - date
+        days = datetime.strptime("01/02/23", "%d/%m/%y") - datetime.strptime("01/01/23", "%d/%m/%y")
+        return periodo > days
+
+class CalculaTrinta:
+    def calcular(self, date):
+        periodo = datetime.now() - date
+        days = datetime.strptime("31/01/23", "%d/%m/%y") - datetime.strptime("01/01/23", "%d/%m/%y")
+        return periodo > days
+
+CalculaValor.register(CalculaTrinta)
+CalculaValor.register(CalculaTrintaEUm)
 
 class Client:
+
+    def _metodoDeCalculo(self):
+        if(self._date.month in [4, 6, 9, 11]):
+            return CalculaTrinta()
+        else:
+            return CalculaTrintaEUm()
+
     def __init__(self, name, service, date=datetime.now()):
         self._name = name
         self._service  = service
         self._date = date
-        self._CalculaValor = CalculaTrinta()
+        self._CalculaValor = self._metodoDeCalculo() #aqui vou mexer depois
 
     def noPrazo(self):
-        return self._CalculaValor.calcular(self._date)
+        if self._CalculaValor.calcular(self._date):
+            return "Prazo Vencido"
+        else:
+            return "No prazo"
 
     def setCalculo(self, CalculoValor):
         self._CalculoValor = CalculoValor
@@ -90,9 +104,8 @@ def insert_date(args, arg_name):
         name = str(arg_name)
         date = datetime.strptime(date, "%d/%m/%y")
         obj = clients[name]
-        obj.date = date
+        obj._date = date
         clients[name] = obj
-        clients.close()
 
 def del_client(args):
     try:
@@ -101,8 +114,6 @@ def del_client(args):
     except KeyError as e:
         print(f'''[!!] No client {args.backspace} on system
 Error: {e}''')
-
-init()
 
 if __name__ == '__main__':
 
