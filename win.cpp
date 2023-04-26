@@ -23,6 +23,7 @@ enum modes {
 
 typedef struct Config {
 	int addMode;
+	bool finishedEdit;
 } Config;
 
 Config application;
@@ -34,14 +35,36 @@ Config application;
 
 class Client {
 	public:
-		void setName(std::string name) {
-			this->name = name;
-		}
+		std::string getName();
+		std::string getService();
+		void setName(std::string name);
+		void setService(std::string service);
+		int isFull();
 	private:
 		std::string name;
 		std::string service;
 		std::string dateOfPayment;
 };
+
+std::string Client::getName() {
+	return this->name;
+}
+	
+std::string Client::getService() {
+	return this->service;
+}
+
+void Client::setName(std::string name) {
+	this->name = name;
+}
+
+void Client::setService(std::string service) {
+	this->service = service;
+}
+
+bool Client::isFull() {
+	return this->service.size() != 0 && this->name.size() != 0;
+}
 
 typedef struct ClientNode {
 	Client client;
@@ -56,6 +79,11 @@ typedef struct ClientList {
 ClientList list;
 
 void addClient(std::string name) {
+	if(!application.finishedEdit) {
+		std::cout << "[!] First you need to complete this client" << std::endl;
+		return;
+	}
+
 	Client client;
 	client.setName(name);
 	ClientNode* novo = new ClientNode();
@@ -78,9 +106,21 @@ void addClient(std::string name) {
 	application.addMode = OFF;
 }
 
-void printList() {
+void printClients() {
 
+	if(list.head == NULL) {
+		std::cout << "[!] No clients in the list" << std::endl;
+		return;
+	}
 
+	ClientNode* aux = list.head;
+	while(aux != NULL) {
+		std::cout << "\nName: " << aux->client.getName() << std::endl;
+		std::cout << "Service: " << aux->client.getService() << std::endl;
+		std::cout << "Length: " << aux->client.isFull() << std::endl;
+
+		aux = aux->next;
+	}
 }
 
 
@@ -119,6 +159,9 @@ void handle(std::string arg) {
 
 	if(arg == "list") 
 		printClients();
+
+	if(arg == "service")
+		std::cout << "\nI'll fix it\n";
 }
 
 /* This functions below do the initialization of the program
@@ -134,6 +177,7 @@ void init() {
 	list.head = NULL;
 	list.tail = NULL;
 	application.addMode = OFF;
+	application.finishedEdit = true;
 }
 
 void printWelcomeMessage() {
@@ -146,7 +190,8 @@ void printWelcomeMessage() {
 	std::cout << "\nFor more information, type win --help:" << std::endl;
 }
 
-int main() {
+int main(int argc, char** argv) {
+	//std::cout << "argc: " << argc << "argv: "<< argv[1];
 	init();
 	printWelcomeMessage();
 	std::string arg;
