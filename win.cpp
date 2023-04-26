@@ -12,6 +12,8 @@
 #include <iostream>
 #include <stdbool.h>
 
+bool isEmpty();
+
 /*
  * Here it's a configuration of the system
  */
@@ -23,6 +25,8 @@ enum modes {
 
 typedef struct Config {
 	int addMode;
+	int sMode;
+	bool isProcessing;
 	bool finishedEdit;
 } Config;
 
@@ -39,7 +43,7 @@ class Client {
 		std::string getService();
 		void setName(std::string name);
 		void setService(std::string service);
-		int isFull();
+		bool isFull();
 	private:
 		std::string name;
 		std::string service;
@@ -81,6 +85,8 @@ ClientList list;
 void addClient(std::string name) {
 	if(!application.finishedEdit) {
 		std::cout << "[!] First you need to complete this client" << std::endl;
+		application.addMode = OFF;
+		application.isProcessing = false;
 		return;
 	}
 
@@ -102,27 +108,47 @@ void addClient(std::string name) {
 		list.tail->next = NULL;
 	}
 
-	std::cout << "\n[*] Client " << name << " added!" << std::endl;
+	application.isProcessing = true;
+	std::cout << "[*] Client " << name << " added!" << std::endl;
 	application.addMode = OFF;
+	application.isProcessing = false;
+	if(!client.isFull()) {
+		application.finishedEdit = false;
+		return;
+	}
+
+	application.finishedEdit = true;
+}
+
+void addService(std::string service) {
+	if(isEmpty()) return;
+
+	list.tail->client.setService(service);
+	std::string name = list.tail->client.getName();
+	std::cout << "[*] Service of " << name << "updated to " << service << std::endl;
+
+	application.sMode = OFF;
+	application.isProcessing = false;
+	if(!list.tail->client.isFull()) {
+		application.finishedEdit = false;
+		return;
+	}
+	application.finishedEdit = true;
+
 }
 
 void printClients() {
-
-	if(list.head == NULL) {
-		std::cout << "[!] No clients in the list" << std::endl;
-		return;
-	}
+	if(isEmpty()) return;
 
 	ClientNode* aux = list.head;
 	while(aux != NULL) {
 		std::cout << "\nName: " << aux->client.getName() << std::endl;
 		std::cout << "Service: " << aux->client.getService() << std::endl;
-		std::cout << "Length: " << aux->client.isFull() << std::endl;
 
 		aux = aux->next;
 	}
+	application.isProcessing = false;
 }
-
 
 /* These are auxiliar functions created to do the tasks in a 
  * quickly way
@@ -136,32 +162,62 @@ bool stringContains(std::string text, std::string word) {
 	}
 	return achou;
 }
+*/
 
- * This functions are responsable to control de flux of the
+bool isEmpty() {
+	if(list.head == NULL) {
+		std::cout << "[!] No clients" << std::endl;
+		application.isProcessing = false;
+		return true;
+	}
+	return false;
+}
+
+bool isValid(std::string arg) {
+	std::cout << "Comand analized: " << arg << std::endl;
+	std::cout << "Size: " << arg.size() << std::endl;
+
+	if((arg != "add" && arg != "service" &&
+	arg != "list") && (application.sMode == OFF &&
+		application.addMode == OFF)) {
+		std::cout << "[!] Invalid command\n";
+		application.isProcessing = false;
+		return false;
+	}
+	return true;
+}
+
+/* This functions are responsable to control de flux of the
  * program and switch to the different ways of the application
  */
 
 void readCommand(std::string *arg) {
-	std::cout << "\033[32mwin@user#> \033[m";
+	if(!application.isProcessing)
+		std::cout << "\033[32mwin@user#> \033[m";
 	std::cin >> *arg;
 }
 
 void handle(std::string arg) {
+	application.isProcessing = true;
+
+	if(!isValid(arg)) return;
+
 	if(application.addMode == ON) {
 		addClient(arg);
 	}
-	std::cout << arg << std::endl;
-	//stringContains(arg, "oi");
-	if(arg == "add") {
-		std::cout << "\nSay to me who you want to add\n";
+
+	if(application.sMode == ON)
+		addService(arg);
+
+	//std::cout << arg << std::endl;
+	if(arg == "add")
 		application.addMode = ON;
-	}
 
 	if(arg == "list") 
 		printClients();
 
 	if(arg == "service")
-		std::cout << "\nI'll fix it\n";
+		application.sMode = ON;
 }
 
 /* This functions below do the initialization of the program
@@ -177,6 +233,8 @@ void init() {
 	list.head = NULL;
 	list.tail = NULL;
 	application.addMode = OFF;
+	application.sMode = OFF;
+	application.isProcessing = false;
 	application.finishedEdit = true;
 }
 
