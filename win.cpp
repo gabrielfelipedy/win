@@ -174,8 +174,8 @@ bool isEmpty() {
 }
 
 bool isValid(std::string arg) {
-	std::cout << "Comand analized: " << arg << std::endl;
-	std::cout << "Size: " << arg.size() << std::endl;
+	//std::cout << "Comand analized: " << arg << std::endl;
+	//std::cout << "Size: " << arg.size() << std::endl;
 
 	if((arg != "add" && arg != "service" &&
 	arg != "list") && (application.sMode == OFF &&
