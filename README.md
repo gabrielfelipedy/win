@@ -1,3 +1,3 @@
-# Win program for screens of streaming management
+# Win
 
 Created by gabrielf3lip3
