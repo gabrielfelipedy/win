@@ -1,200 +1,33 @@
-/* 
- * Win it's a program that is designed to be a pratical and 
+/* Win it's a program that is designed to be a pratical and 
  * quickly method to save, change and delete data of clients
  * of a determinated service
  *
  * Author: Gabriel Felipe
  * Github: https://github.com/gabrielfelipeassuncaodesouza
  * Email: gabrielfelipeassuncaodesouza@gmail.com
- *
  */
+
+#include "client_class.h"
+#include "client_list.h"
+#include "globconst.h"
 
 #include <iostream>
 #include <stdbool.h>
 
-bool isEmpty();
-
-/*
- * Here it's a configuration of the system
- */
-
-enum modes {
-	OFF = 0,
-	ON
-};
-
-typedef struct Config {
-	int addMode;
-	int sMode;
-	bool isProcessing;
-	bool finishedEdit;
-} Config;
-
-Config application;
-
-/* Here it's defined the class Client who contains all
- * informations about the client. So, all operations with
- * dates and more else will be done here
- */
-
-class Client {
-	public:
-		std::string getName();
-		std::string getService();
-		void setName(std::string name);
-		void setService(std::string service);
-		bool isFull();
-	private:
-		std::string name;
-		std::string service;
-		std::string dateOfPayment;
-};
-
-std::string Client::getName() {
-	return this->name;
-}
-	
-std::string Client::getService() {
-	return this->service;
-}
-
-void Client::setName(std::string name) {
-	this->name = name;
-}
-
-void Client::setService(std::string service) {
-	this->service = service;
-}
-
-bool Client::isFull() {
-	return this->service.size() != 0 && this->name.size() != 0;
-}
-
-typedef struct ClientNode {
-	Client client;
-	ClientNode* next;
-} ClientNode;
-
-typedef struct ClientList {
-	ClientNode* head;
-	ClientNode* tail;
-} ClientList;
-
+config_t application;
 ClientList list;
-
-void addClient(std::string name) {
-	if(!application.finishedEdit) {
-		std::cout << "[!] First you need to complete this client" << std::endl;
-		application.addMode = OFF;
-		application.isProcessing = false;
-		return;
-	}
-
-	Client client;
-	client.setName(name);
-	ClientNode* novo = new ClientNode();
-	novo->client = client;
-
-	if(list.head == NULL) {
-		novo->next = NULL;
-		list.head = novo;
-		list.tail = novo;
-	}
-
-	else
-	{
-		list.tail->next = novo;
-		list.tail = novo;
-		list.tail->next = NULL;
-	}
-
-	application.isProcessing = true;
-	std::cout << "[*] Client " << name << " added!" << std::endl;
-	application.addMode = OFF;
-	application.isProcessing = false;
-	if(!client.isFull()) {
-		application.finishedEdit = false;
-		return;
-	}
-
-	application.finishedEdit = true;
-}
-
-void addService(std::string service) {
-	if(isEmpty()) return;
-
-	list.tail->client.setService(service);
-	std::string name = list.tail->client.getName();
-	std::cout << "[*] Service of " << name << "updated to " << service << std::endl;
-
-	application.sMode = OFF;
-	application.isProcessing = false;
-	if(!list.tail->client.isFull()) {
-		application.finishedEdit = false;
-		return;
-	}
-	application.finishedEdit = true;
-
-}
-
-void printClients() {
-	if(isEmpty()) return;
-
-	ClientNode* aux = list.head;
-	while(aux != NULL) {
-		std::cout << "\nName: " << aux->client.getName() << std::endl;
-		std::cout << "Service: " << aux->client.getService() << std::endl;
-
-		aux = aux->next;
-	}
-	application.isProcessing = false;
-}
-
-/* These are auxiliar functions created to do the tasks in a 
- * quickly way
- *
-
-bool stringContains(std::string text, std::string word) {
-	bool achou = false;
-	int i, j;
-	for(i = 0; i < text.size(); i++) {
-		std::cout << i << std::endl;
-	}
-	return achou;
-}
-*/
-
-bool isEmpty() {
-	if(list.head == NULL) {
-		std::cout << "[!] No clients" << std::endl;
-		application.isProcessing = false;
-		return true;
-	}
-	return false;
-}
-
-bool isValid(std::string arg) {
-	//std::cout << "Comand analized: " << arg << std::endl;
-	//std::cout << "Size: " << arg.size() << std::endl;
-
-	if((arg != "add" && arg != "service" &&
-	arg != "list") && (application.sMode == OFF &&
-		application.addMode == OFF)) {
-		std::cout << "[!] Invalid command\n";
-		application.isProcessing = false;
-		return false;
-	}
-	return true;
-}
 
 /* This functions are responsable to control de flux of the
  * program and switch to the different ways of the application
  */
 
-void readCommand(std::string *arg) {
+std::string readCommand(void) {
+	std::string ret;
 	if(!application.isProcessing)
 		std::cout << "\033[32mwin@user#> \033[m";
-	std::cin >> *arg;
+	std::cin >> ret;
+
+	return ret;
 }
 
 void handle(std::string arg) {
@@ -209,7 +42,6 @@ void handle(std::string arg) {
 	if(application.sMode == ON)
 		addService(arg);
 
-	//std::cout << arg << std::endl;
 	if(arg == "add")
 		application.addMode = ON;
 
@@ -252,9 +84,10 @@ int main(int argc, char** argv) {
 	//std::cout << "argc: " << argc << "argv: "<< argv[1];
 	init();
 	printWelcomeMessage();
+
 	std::string arg;
 	do {
-		readCommand(&arg);
+		arg = readCommand();
 		handle(arg);
 	} while(arg != "exit");
 	return 0;
