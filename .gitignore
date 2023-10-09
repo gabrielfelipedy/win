@@ -2,3 +2,6 @@ data
 test
 win
 data.txt
+
+*.exe
+*.out
