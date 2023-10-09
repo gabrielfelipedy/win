@@ -14,17 +14,17 @@ void addClient(std::string name) {
 	ClientNode* novo = new ClientNode();
 	novo->client = client;
 
-	if(list.head == NULL) {
+	if(l.head == NULL) {
 		novo->next = NULL;
-		list.head = novo;
-		list.tail = novo;
+		l.head = novo;
+		l.tail = novo;
 	}
 
 	else
 	{
-		list.tail->next = novo;
-		list.tail = novo;
-		list.tail->next = NULL;
+		l.tail->next = novo;
+		l.tail = novo;
+		l.tail->next = NULL;
 	}
 
 	application.isProcessing = true;
@@ -42,13 +42,13 @@ void addClient(std::string name) {
 void addService(std::string service) {
 	if(isEmpty()) return;
 
-	list.tail->client.setService(service);
-	std::string name = list.tail->client.getName();
+	l.tail->client.setService(service);
+	std::string name = l.tail->client.getName();
 	std::cout << "[*] Service of " << name << "updated to " << service << std::endl;
 
 	application.sMode = OFF;
 	application.isProcessing = false;
-	if(!list.tail->client.isFull()) {
+	if(!l.tail->client.isFull()) {
 		application.finishedEdit = false;
 		return;
 	}
@@ -59,7 +59,7 @@ void addService(std::string service) {
 void printClients(void) {
 	if(isEmpty()) return;
 
-	ClientNode* aux = list.head;
+	ClientNode* aux = l.head;
 	while(aux != NULL) {
 		std::cout << "\nName: " << aux->client.getName() << std::endl;
 		std::cout << "Service: " << aux->client.getService() << std::endl;
@@ -70,7 +70,7 @@ void printClients(void) {
 }
 
 bool isEmpty(void) {
-	if(list.head == NULL) {
+	if(l.head == NULL) {
 		std::cout << "[!] No clients" << std::endl;
 		application.isProcessing = false;
 		return true;

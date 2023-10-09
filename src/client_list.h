@@ -13,7 +13,7 @@ typedef struct ClientList {
 	ClientNode* tail;
 } ClientList;
 
-extern ClientList list;
+extern ClientList l;
 
 void addService(std::string service);
 void addClient(std::string name);

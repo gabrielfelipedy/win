@@ -6,18 +6,19 @@
  * Github: https://github.com/gabrielfelipeassuncaodesouza
  * Email: gabrielfelipeassuncaodesouza@gmail.com
  */
-
+#include "actions.h"
 #include "client_class.h"
 #include "client_list.h"
 #include "globconst.h"
 
 #include <cstdbool>
+#include <cstring>
 #include <sstream>
 #include <iostream>
 #include <vector>
 
 config_t application;
-ClientList list;
+ClientList l;
 
 /* This functions are responsable to control de flux of the
  * program and switch to the different ways of the application
@@ -36,8 +37,8 @@ std::string readCommand(void) {
 
 
 void init() {
-	list.head = NULL;
-	list.tail = NULL;
+	l.head = NULL;
+	l.tail = NULL;
 	application.addMode = OFF;
 	application.sMode = OFF;
 	application.isProcessing = false;
@@ -64,11 +65,12 @@ void splitLine(std::string line, std::vector<std::string>* list) {
 }
 
 int execute(std::vector<std::string> args) {
-	if(args.front() == "exit") return 0;
+	if(args.size() == 0) return 1;
 
-	for(auto str : args) {
-		std::cout << "str: " << str << std::endl;
-		std::cout << "head: " << args.front() << std::endl;
+	for(int i = 0; i < QTDE_BUTILS; i++) {
+		if(args.front().compare(bultin_str[i]) == 0) {
+			return (*bultin_func[i])();
+		}
 	}
 
 	return 1;
