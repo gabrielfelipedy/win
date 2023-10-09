@@ -11,8 +11,10 @@
 #include "client_list.h"
 #include "globconst.h"
 
+#include <cstdbool>
+#include <sstream>
 #include <iostream>
-#include <stdbool.h>
+#include <vector>
 
 config_t application;
 ClientList list;
@@ -25,41 +27,13 @@ std::string readCommand(void) {
 	std::string ret;
 	if(!application.isProcessing)
 		std::cout << "\033[32mwin@user#> \033[m";
-	std::cin >> ret;
+	
+
+	std::getline(std::cin, ret);
 
 	return ret;
 }
 
-void handle(std::string arg) {
-	application.isProcessing = true;
-
-	if(!isValid(arg)) return;
-
-	if(application.addMode == ON) {
-		addClient(arg);
-	}
-
-	if(application.sMode == ON)
-		addService(arg);
-
-	if(arg == "add")
-		application.addMode = ON;
-
-	if(arg == "list") 
-		printClients();
-
-	if(arg == "service")
-		application.sMode = ON;
-}
-
-/* This functions below do the initialization of the program
- *
- * The function init sets the pointers head and tail of the
- * list to NULL value
- *
- * The function printWelcomeMessage shows to the user a manual about how to use them
- *
- */
 
 void init() {
 	list.head = NULL;
@@ -80,15 +54,43 @@ void printWelcomeMessage() {
 	std::cout << "\nFor more information, type win --help:" << std::endl;
 }
 
+void splitLine(std::string line, std::vector<std::string>* list) {
+
+	std::string token;
+	std::istringstream f(line);
+
+	while(std::getline(f, token, ' '))
+		(*list).push_back(token);
+}
+
+int execute(std::vector<std::string> args) {
+	if(args.front() == "exit") return 0;
+
+	for(auto str : args) {
+		std::cout << "str: " << str << std::endl;
+		std::cout << "head: " << args.front() << std::endl;
+	}
+
+	return 1;
+}
+
 int main(int argc, char** argv) {
 	//std::cout << "argc: " << argc << "argv: "<< argv[1];
 	init();
 	printWelcomeMessage();
 
-	std::string arg;
+	std::string line;
+	std::vector<std::string> args;
+	
+	int status;
+
 	do {
-		arg = readCommand();
-		handle(arg);
-	} while(arg != "exit");
-	return 0;
+		args.clear();
+		line = readCommand();
+		splitLine(line, &args);
+		status = execute(args);
+
+	} while(status);
+
+	return EXIT_SUCCESS;
 }

@@ -5,3 +5,7 @@ data.txt
 
 *.exe
 *.out
+
+settings.json
+.vscode
+output
