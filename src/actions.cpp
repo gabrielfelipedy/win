@@ -39,5 +39,17 @@ int add(std::vector<std::string> args) {
 
 int service(std::vector<std::string> args) {
     std::cout << "you typed service" << std::endl;
+
+    std::string service;
+
+    if(args.size() < 2) {
+        std::cout << "Type the name of the service: ";
+        std::cin >> service;
+        while(getchar() != '\n');
+    }
+    else service = args.at(1);
+
+    addService(service);
+
     return 1;
 }
