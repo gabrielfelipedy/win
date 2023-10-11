@@ -2,12 +2,6 @@
 #include "globconst.h"
 
 void addClient(std::string name) {
-	if(!application.finishedEdit) {
-		std::cout << "[!] First you need to complete this client" << std::endl;
-		application.addMode = OFF;
-		application.isProcessing = false;
-		return;
-	}
 
 	Client client;
 	client.setName(name);
@@ -19,7 +13,6 @@ void addClient(std::string name) {
 		l.head = novo;
 		l.tail = novo;
 	}
-
 	else
 	{
 		l.tail->next = novo;
@@ -31,6 +24,7 @@ void addClient(std::string name) {
 	std::cout << "[*] Client " << name << " added!" << std::endl;
 	application.addMode = OFF;
 	application.isProcessing = false;
+
 	if(!client.isFull()) {
 		application.finishedEdit = false;
 		return;
