@@ -67,9 +67,9 @@ void splitLine(std::string line, std::vector<std::string>* list) {
 int execute(std::vector<std::string> args) {
 	if(args.size() == 0) return 1;
 
-	for(int i = 0; i < QTDE_BUTILS; i++) {
+	for(int i = 0; i < num_bultins(); i++) {
 		if(args.front().compare(bultin_str[i]) == 0) {
-			return (*bultin_func[i])();
+			return (*bultin_func[i])(args);
 		}
 	}
 
