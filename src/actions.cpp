@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "client_list.h"
+#include "globconst.h"
 
 #include <vector>
 
@@ -33,6 +34,11 @@ int add(std::vector<std::string> args) {
     else name = args.at(1);
 
     addClient(name);
+
+    if(args.size() >= 3) {
+      std::vector<std::string> sub = { args.begin() + 2, args.end() };
+      execute(sub);
+    }
 
     return 1;
 }

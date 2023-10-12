@@ -29,12 +29,10 @@ std::string readCommand(void) {
 	if(!application.isProcessing)
 		std::cout << "\033[32mwin@user#> \033[m";
 	
-
 	std::getline(std::cin, ret);
 
 	return ret;
 }
-
 
 void init() {
 	l.head = NULL;

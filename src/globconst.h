@@ -1,6 +1,9 @@
 #ifndef _H_CONST
 #define _H_CONST
 
+#include <iostream>
+#include <vector>
+
 enum modes {
 	OFF = 0,
 	ON
@@ -16,5 +19,6 @@ typedef struct {
 extern config_t application;
 
 bool isEmpty();
+int execute(std::vector<std::string> args);
 
 #endif

@@ -38,7 +38,7 @@ void addService(std::string service) {
 
 	l.tail->client.setService(service);
 	std::string name = l.tail->client.getName();
-	std::cout << "[*] Service of " << name << "updated to " << service << std::endl;
+	std::cout << "[*] Service of " << name << " updated to " << service << std::endl;
 
 	application.sMode = OFF;
 	application.isProcessing = false;
