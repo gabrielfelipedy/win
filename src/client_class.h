@@ -5,6 +5,8 @@
 
 class Client {
 	public:
+    Client();
+    
 		std::string getName();
 		std::string getService();
 		void setName(std::string name);

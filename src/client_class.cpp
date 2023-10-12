@@ -1,6 +1,11 @@
 #include <iostream>
 #include "client_class.h"
 
+Client::Client() {
+  this->name = "default";
+  this->service = "default";
+}
+
 std::string Client::getName() {
 	return this->name;
 }

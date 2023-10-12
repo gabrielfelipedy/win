@@ -2,7 +2,6 @@
 #include "globconst.h"
 
 void addClient(std::string name) {
-
 	Client client;
 	client.setName(name);
 	ClientNode* novo = new ClientNode();
